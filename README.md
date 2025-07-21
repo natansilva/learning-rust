@@ -23,3 +23,6 @@ cargo build
 # Compile/execute rust project
 cargo run
 ```
+
+---------------
+Inspired by [TheAlgorithms/Rust](https://github.com/TheAlgorithms/Rust)
