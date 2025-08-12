@@ -1,27 +1,12 @@
-use rand::Rng;
-
-pub struct Dice {
-    sides: u32,
+#[derive(Debug)]
+pub struct Sheet {
+    pub name: String,
+    pub health: u32,
+    pub armor: u32,
+    pub attack: u32,
 }
 
-impl Dice {
-    pub fn new(sides: u32) -> Dice {
-        Dice { sides }
-    }
-
-    pub fn roll(&self) -> u32 {
-        rand::thread_rng().gen_range(1..=self.sides)
-    }
-}
-
-pub struct Player {
-    name: String,
-    health: u32,
-    armor: u32,
-    attack: u32,
-}
-
-impl Player {
+impl Sheet {
     pub fn new(name: String, health: u32, armor: u32, attack: u32) -> Self {
         Self {
             name,
@@ -29,18 +14,6 @@ impl Player {
             armor,
             attack,
         }
-    }
-
-    pub fn get_attack(&self) -> u32 {
-        self.attack
-    }
-
-    pub fn get_health(&self) -> u32 {
-        self.health
-    }
-
-    pub fn get_name(&self) -> &str {
-        &self.name
     }
 
     pub fn is_alive(&self) -> bool {
@@ -55,6 +28,7 @@ impl Player {
         let damage = damage - self.armor;
 
         if self.health >= damage {
+            println!("{} takes {} damage", self.name, damage);
             self.health -= damage;
         }
 

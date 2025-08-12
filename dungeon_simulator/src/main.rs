@@ -1,52 +1,48 @@
-use dungeon_simulator::Dice;
-use dungeon_simulator::Player;
+mod supplies;
+
+use crate::supplies::{Dice, Sheet};
 
 fn main() {
     let dice = Dice::new(6);
-    let mut boss = Player::new("Blue Dragon".to_string(), 1000, 15, 10);
-    let mut barbarian = Player::new("Barbarian".to_string(), 100, 10, 20);
-    let mut mage = Player::new("Mage".to_string(), 100, 5, 20);
-    let mut players: Vec<&mut Player> = vec![&mut barbarian, &mut mage];
+
+    let mut boss = Sheet::new(String::from("Blue Dragon"), 1000, 15, 10);
+
+    let mut barbarian = Sheet::new(String::from("Barbarian"), 100, 5, 30);
+    let mut warrior = Sheet::new(String::from("Warrior"), 100, 10, 20);
+    let mut mage = Sheet::new(String::from("Mage"), 100, 5, 20);
+    let mut players: Vec<&mut Sheet> = vec![&mut barbarian, &mut warrior, &mut mage];
 
     loop {
-        for player in &players {
-            let damage = dice.roll() + player.get_attack();
-    
-            println!("Player `{}` attack with {}", player.get_name(), damage);        
+        for player in players.iter_mut() {
+            let damage = dice.roll() + player.attack;
             boss.take_damage(damage);
-            println!("Now boss `{}` has {} health", boss.get_name(), boss.get_health());
+
+            let boss_damage = dice.roll() + boss.attack;
+            player.take_damage(boss_damage);
         }
-    
-        boss_attack(&mut boss, &mut players, &dice);
-    
+
         if end_battle_check(&mut players, &boss) {
+            println!("---------");
             println!("Battle ended");
+
+            for player in &players {
+                println!("Player `{}` has {} health left", player.name, player.health);
+            }
+            println!("Boss has {} health left", boss.health);
             break;
         }
     }
 
 }
 
-fn end_battle_check(players: &mut Vec<&mut Player>, boss: &Player) -> bool {
+fn end_battle_check(players: &mut Vec<&mut Sheet>, boss: &Sheet) -> bool {
     if players.iter().all(|player| !player.is_alive()) {
-        println!("All players are dead");
         return true;
     }
 
-    if ! boss.is_alive() {
-        println!("Boss is dead");
+    if !boss.is_alive() {
         return true;
     }
 
     return false;
-}
-
-fn boss_attack(boss: &mut Player, players: &mut Vec<&mut Player>, dice: &Dice) {
-    let random_index = dice.roll() % players.len() as u32;
-    let player = &mut players[random_index as usize];
-
-    let damage = dice.roll() + boss.get_attack();
-    println!("Boss `{}` attacks player `{}` with {}", boss.get_name(), player.get_name(), damage);
-    println!("Now player `{}` has {} health", player.get_name(), player.get_health());
-    player.take_damage(damage);
 }
